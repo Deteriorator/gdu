@@ -26,6 +26,7 @@ type UI struct {
 	blue      *color.Color
 	summarize bool
 	noPrefix  bool
+	top       int
 }
 
 var (
@@ -45,6 +46,7 @@ func CreateStdoutUI(
 	constGC bool,
 	useSIPrefix bool,
 	noPrefix bool,
+	top int,
 ) *UI {
 	ui := &UI{
 		UI: &common.UI{
@@ -59,6 +61,7 @@ func CreateStdoutUI(
 		output:    output,
 		summarize: summarize,
 		noPrefix:  noPrefix,
+		top:       top,
 	}
 
 	ui.red = color.New(color.FgRed).Add(color.Bold)
@@ -89,7 +92,7 @@ func (ui *UI) ListDevices(getter device.DevicesInfoGetter) error {
 		return err
 	}
 
-	maxDeviceNameLenght := maxInt(maxLength(
+	maxDeviceNameLength := maxInt(maxLength(
 		devices,
 		func(device *device.Device) string { return device.Name },
 	), len("Devices"))
@@ -105,7 +108,7 @@ func (ui *UI) ListDevices(getter device.DevicesInfoGetter) error {
 
 	lineFormat := fmt.Sprintf(
 		"%%%ds %%%ds %%%ds %%%ds %%%ds %%s\n",
-		maxDeviceNameLenght,
+		maxDeviceNameLength,
 		sizeLength,
 		sizeLength,
 		sizeLength,
@@ -114,7 +117,7 @@ func (ui *UI) ListDevices(getter device.DevicesInfoGetter) error {
 
 	fmt.Fprintf(
 		ui.output,
-		fmt.Sprintf("%%%ds %%9s %%9s %%9s %%5s %%s\n", maxDeviceNameLenght),
+		fmt.Sprintf("%%%ds %%9s %%9s %%9s %%5s %%s\n", maxDeviceNameLength),
 		"Device",
 		"Size",
 		"Used",
@@ -167,9 +170,12 @@ func (ui *UI) AnalyzePath(path string, _ fs.Item) error {
 
 	wait.Wait()
 
-	if ui.summarize {
+	switch {
+	case ui.top > 0:
+		ui.printTopFiles(dir)
+	case ui.summarize:
 		ui.printTotalItem(dir)
-	} else {
+	default:
 		ui.showDir(dir)
 	}
 
@@ -187,9 +193,12 @@ func (ui *UI) ReadFromStorage(storagePath, path string) error {
 		return err
 	}
 
-	if ui.summarize {
+	switch {
+	case ui.top > 0:
+		ui.printTopFiles(dir)
+	case ui.summarize:
 		ui.printTotalItem(dir)
-	} else {
+	default:
 		ui.showDir(dir)
 	}
 	return nil
@@ -200,6 +209,13 @@ func (ui *UI) showDir(dir fs.Item) {
 
 	for _, file := range dir.GetFiles() {
 		ui.printItem(file)
+	}
+}
+
+func (ui *UI) printTopFiles(file fs.Item) {
+	collected := analyze.CollectTopFiles(file, ui.top)
+	for _, file := range collected {
+		ui.printItemPath(file)
 	}
 }
 
@@ -246,7 +262,7 @@ func (ui *UI) printItem(file fs.Item) {
 			lineFormat,
 			string(file.GetFlag()),
 			ui.formatSize(size),
-			ui.blue.Sprintf("/"+file.GetName()))
+			ui.blue.Sprint("/"+file.GetName()))
 	} else {
 		fmt.Fprintf(ui.output,
 			lineFormat,
@@ -254,6 +270,27 @@ func (ui *UI) printItem(file fs.Item) {
 			ui.formatSize(size),
 			file.GetName())
 	}
+}
+
+func (ui *UI) printItemPath(file fs.Item) {
+	var lineFormat string
+	if ui.UseColors {
+		lineFormat = "%20s %s\n"
+	} else {
+		lineFormat = "%9s %s\n"
+	}
+
+	var size int64
+	if ui.ShowApparentSize {
+		size = file.GetSize()
+	} else {
+		size = file.GetUsage()
+	}
+
+	fmt.Fprintf(ui.output,
+		lineFormat,
+		ui.formatSize(size),
+		file.GetPath())
 }
 
 // ReadAnalysis reads analysis report from JSON file
