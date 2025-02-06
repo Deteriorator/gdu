@@ -24,17 +24,21 @@ is not so huge.
 
 **-h**, **\--help**\[=false\] help for gdu
 
-**-i**, **\--ignore-dirs**=\[/proc,/dev,/sys,/run\] Absolute paths to
-ignore (separated by comma)
+**-i**, **\--ignore-dirs**=\[/proc,/dev,/sys,/run\]
+    Paths to ignore (separated by comma).
+    Supports both absolute and relative paths.
 
-**-I**, **\--ignore-dirs-pattern** Absolute path patterns to
-ignore (separated by comma)
+**-I**, **\--ignore-dirs-pattern**
+    Path patterns to ignore (separated by comma).
+    Supports both absolute and relative path patterns.
 
-**-X**, **\--ignore-from** Read absolute path patterns to ignore from file
+**-X**, **\--ignore-from**
+    Read path patterns to ignore from file.
+    Supports both absolute and relative path patterns.
 
 **-l**, **\--log-file**=\"/dev/null\" Path to a logfile
 
-**-m**, **\--max-cores** Set max cores that GDU will use.
+**-m**, **\--max-cores** Set max cores that Gdu will use.
 
 **-c**, **\--no-color**\[=false\] Do not use colorized output
 
@@ -53,6 +57,8 @@ non-interactive mode
 **-u**, **\--no-unicode**\[=false\] Do not use Unicode symbols (for size bar)
 
 **-s**, **\--summarize**\[=false\] Show only a total in non-interactive mode
+
+**-t**, **\--top**\[=0\] Show only top X largest files in non-interactive mode
 
 **-d**, **\--show-disks**\[=false\] Show all mounted disks
 

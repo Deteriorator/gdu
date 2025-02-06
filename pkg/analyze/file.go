@@ -86,8 +86,8 @@ func (f *File) alreadyCounted(linkedItems fs.HardLinkedItems) bool {
 	mli := f.Mli
 	counted := false
 	if mli > 0 {
+		f.Flag = 'H'
 		if _, ok := linkedItems[mli]; ok {
-			f.Flag = 'H'
 			counted = true
 		}
 		linkedItems[mli] = append(linkedItems[mli], f)
@@ -145,7 +145,7 @@ type Dir struct {
 	m         sync.RWMutex
 }
 
-// AddFile add item fo files
+// AddFile add item to files
 func (f *Dir) AddFile(item fs.Item) {
 	f.Files = append(f.Files, item)
 }

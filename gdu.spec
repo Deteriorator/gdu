@@ -1,6 +1,6 @@
 Name:           gdu
-Version:        5.29.0
-Release:        1
+Version:        5.30.1
+Release:        2
 Summary:        Pretty fast disk usage analyzer written in Go
 
 License:        MIT
@@ -23,6 +23,7 @@ Pretty fast disk usage analyzer written in Go.
 %autosetup -n %{name}-%{version}
 
 %build
+export GOINSECURE=go.opencensus.io
 GO111MODULE=on CGO_ENABLED=0 go build \
 -trimpath \
 -buildmode=pie \
@@ -51,6 +52,13 @@ install -Dpm 0755 %{name}.1 $RPM_BUILD_ROOT%{_mandir}/man1/gdu.1
 %{_mandir}/man1/gdu.1.gz
 
 %changelog
+* Tue Feb 4 2025 - Danie de Jager - 5.30.1-2
+- fix: set "GOINSECURE=go.opencensus.io"
+* Mon Dec 30 2024 Daniel Milde - 5.30.1-1
+- fix: set default colors when config file does not exist
+* Mon Dec 30 2024 Daniel Milde - 5.30.0-1
+- feat: show top largest files using -t or --top option in #391
+- feat: introduce more style options in #396
 * Mon Jun 17 2024 Daniel Milde - 5.29.0-1
 - feat: support for reading gzip, bzip2 and xz files by @dundee in #363
 - feat: add --show-mtime (-M) option by @dundee in #350
@@ -83,7 +91,7 @@ install -Dpm 0755 %{name}.1 $RPM_BUILD_ROOT%{_mandir}/man1/gdu.1
 - feat: add ctrl+z for job control by @yurenchen000 in #250
 - feat: upgrade dependencies by @dundee in #252
 * Thu May 11 2023 Danie de Jager - 5.23.0-2
-- Compiled wiht golang 1.19.9
+- Compiled with golang 1.19.9
 * Tue Apr 11 2023 Danie de Jager - 5.23.0-1
 - feat: added configuration option to change CWD when browsing directories by @leapfog in #230
 - fix: do not show help modal when confirm modal is already opened by @dundee in #237

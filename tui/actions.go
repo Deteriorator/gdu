@@ -24,7 +24,7 @@ import (
 
 const (
 	defaultLinesCount = 500
-	linesTreshold     = 20
+	linesThreshold    = 20
 
 	actionEmpty  = "empty"
 	actionDelete = "delete"
@@ -256,7 +256,10 @@ func (ui *UI) showInfo() {
 	selectedFile := ui.table.GetCell(row, column).GetReference().(fs.Item)
 
 	if ui.UseColors {
-		numberColor = orangeBold
+		numberColor = fmt.Sprintf(
+			"[%s::b]",
+			ui.resultRow.NumberColor,
+		)
 	} else {
 		numberColor = defaultColorBold
 	}
@@ -393,11 +396,11 @@ func (ui *UI) exportAnalysis() {
 		}
 
 		if _, err = buff.Write([]byte("]\n")); err != nil {
-			ui.showErrFromGo("Error writting to buffer", err)
+			ui.showErrFromGo("Error writing to buffer", err)
 			return
 		}
 		if _, err = buff.WriteTo(file); err != nil {
-			ui.showErrFromGo("Error writting to file", err)
+			ui.showErrFromGo("Error writing to file", err)
 			return
 		}
 	}()
